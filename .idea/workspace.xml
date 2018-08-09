@@ -1,7 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="5ba6f33f-6303-4aea-81dd-351a374ffeda" name="Default" comment="" />
+    <list default="true" id="5ba6f33f-6303-4aea-81dd-351a374ffeda" name="Default" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/src/data_utils.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/src/data_utils.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/src/linear_model.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/src/linear_model.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/src/predict_3dpose_eccv18.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/src/predict_3dpose_eccv18.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/util/change_name.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/util/change_name.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Model/util/generate_file_list.py" beforeDir="false" afterPath="$PROJECT_DIR$/Model/util/generate_file_list.py" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -10,7 +18,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="CoverageDataManager">
-    <SUITE FILE_PATH="coverage/ECCV18$test.coverage" NAME="test Coverage Results" MODIFIED="1533561104763" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Model/src" />
+    <SUITE FILE_PATH="coverage/ECCV18$test.coverage" NAME="test Coverage Results" MODIFIED="1533816115429" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/Model/src" />
   </component>
   <component name="FavoritesManager">
     <favorites_list name="ECCV18" />
@@ -20,7 +28,7 @@
       <file leaf-file-name="predict_3dpose.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Model/src/predict_3dpose.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="8064">
+            <state relative-caret-position="7769">
               <caret line="469" column="52" selection-start-line="469" selection-start-column="52" selection-end-line="469" selection-end-column="52" />
               <folding>
                 <element signature="e#43#81#0" expanded="true" />
@@ -32,8 +40,8 @@
       <file leaf-file-name="data_utils.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Model/src/data_utils.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="10854">
-              <caret line="615" selection-start-line="615" selection-end-line="615" />
+            <state relative-caret-position="532">
+              <caret line="153" selection-start-line="153" selection-end-line="153" />
               <folding>
                 <element signature="e#59#90#0" expanded="true" />
               </folding>
@@ -41,29 +49,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="session.py" pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/Library/Caches/PyCharm2018.1/remote_sources/-1340077647/-1227933812/tensorflow/python/client/session.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="19692">
-              <caret line="1115" selection-start-line="1115" selection-end-line="1115" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="viz.py" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Model/src/viz.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="72">
-              <caret line="4" selection-start-line="4" selection-end-line="4" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="predict_3dpose_eccv18.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="predict_3dpose_eccv18.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Model/src/predict_3dpose_eccv18.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="738">
-              <caret line="63" selection-start-line="63" selection-end-line="63" />
+            <state relative-caret-position="199">
+              <caret line="30" column="46" selection-start-line="30" selection-start-column="42" selection-end-line="30" selection-end-column="46" />
               <folding>
                 <element signature="e#43#81#0" expanded="true" />
               </folding>
@@ -71,11 +61,44 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="linear_model.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="app.py" pinned="false" current-in-tab="false">
+        <entry file="file://$USER_HOME$/Library/Caches/PyCharm2018.1/remote_sources/-1340077647/-1227933812/tensorflow/python/platform/app.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="744">
+              <caret line="125" selection-start-line="125" selection-end-line="125" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="linear_model.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Model/src/linear_model.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="444">
-              <caret line="419" column="32" selection-start-line="419" selection-start-column="32" selection-end-line="419" selection-end-column="32" />
+            <state relative-caret-position="2664">
+              <caret line="378" column="14" selection-start-line="378" selection-start-column="14" selection-end-line="378" selection-end-column="14" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="generate_file_list.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Model/util/generate_file_list.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="252">
+              <caret line="14" selection-start-line="14" selection-end-line="16" selection-end-column="109" />
+              <folding>
+                <element signature="e#0#9#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="change_name.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Model/util/change_name.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="72">
+              <caret line="4" selection-start-line="4" selection-end-line="24" />
+              <folding>
+                <element signature="e#0#9#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -83,15 +106,6 @@
       <file leaf-file-name="cameras.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Model/src/cameras.py">
           <provider selected="true" editor-type-id="text-editor" />
-        </entry>
-      </file>
-      <file leaf-file-name="linalg.py" pinned="false" current-in-tab="false">
-        <entry file="file://$USER_HOME$/Library/Caches/PyCharm2018.1/remote_sources/-1340077647/-1227933812/numpy/linalg/linalg.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1746">
-              <caret line="97" selection-start-line="97" selection-end-line="97" />
-            </state>
-          </provider>
         </entry>
       </file>
       <file leaf-file-name="flags.py" pinned="false" current-in-tab="false">
@@ -123,12 +137,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>get_all_batches</find>
-      <find>create_</find>
-      <find>data_dir</find>
-      <find>train_dir</find>
-      <find>get_all_batches_eccv18</find>
-      <find>create_model</find>
       <find>create</find>
       <find>batch_size</find>
       <find>step</find>
@@ -138,8 +146,6 @@
       <find>generate_3dpose_eccv18</find>
       <find>compute_similarity_transform</find>
       <find>dir</find>
-      <find>get_all_batches_2D_eccv18</find>
-      <find>split</find>
       <find>128</find>
       <find>eccv18</find>
       <find>batch_norm</find>
@@ -151,17 +157,28 @@
       <find>normalization_stats_eccv18</find>
       <find>17</find>
       <find>procrus</find>
-      <find>read_data_eccv18</find>
       <find>gpu</find>
+      <find>eval</find>
+      <find>data_dir</find>
+      <find>get_all_batches_2D_eccv18</find>
+      <find>eccv</find>
+      <find>read_data_eccv</find>
+      <find>split</find>
+      <find>read_data_eccv18</find>
+      <find>for_submi</find>
+      <find>for_eccv</find>
     </findStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/Model/src/predict_3dpose.py" />
-        <option value="$PROJECT_DIR$/Model/util/change_name.py" />
-        <option value="$PROJECT_DIR$/Model/util/generate_file_list.py" />
         <option value="$PROJECT_DIR$/Model/src/linear_model.py" />
+        <option value="$PROJECT_DIR$/Model/util/generate_file_list.py" />
+        <option value="$PROJECT_DIR$/Model/util/change_name.py" />
         <option value="$PROJECT_DIR$/Model/src/data_utils.py" />
         <option value="$PROJECT_DIR$/Model/src/predict_3dpose_eccv18.py" />
       </list>
@@ -177,8 +194,10 @@
     <packageJsonPaths />
   </component>
   <component name="ProjectFrameBounds" fullScreen="true">
-    <option name="width" value="1680" />
-    <option name="height" value="1050" />
+    <option name="x" value="1680" />
+    <option name="y" value="-126" />
+    <option name="width" value="2560" />
+    <option name="height" value="1440" />
   </component>
   <component name="ProjectView">
     <navigator proportions="" version="1">
@@ -192,6 +211,23 @@
             <path>
               <item name="ECCV18" type="b2602c69:ProjectViewProjectNode" />
               <item name="ECCV18" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ECCV18" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ECCV18" type="462c0819:PsiDirectoryNode" />
+              <item name="Model" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ECCV18" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ECCV18" type="462c0819:PsiDirectoryNode" />
+              <item name="Model" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ECCV18" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ECCV18" type="462c0819:PsiDirectoryNode" />
+              <item name="Model" type="462c0819:PsiDirectoryNode" />
+              <item name="util" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -270,24 +306,25 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1680" height="1050" extended-state="0" />
+    <frame x="1680" y="-126" width="2560" height="1440" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
       <window_info anchor="bottom" id="Database Changes" order="8" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" order="9" show_stripe_button="false" />
+      <window_info anchor="bottom" id="File Transfer" order="13" weight="0.3340336" />
+      <window_info anchor="bottom" id="Version Control" order="9" />
       <window_info anchor="bottom" id="Python Console" order="10" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.29516807" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.19597615" />
       <window_info anchor="bottom" id="Terminal" order="11" weight="0.32983193" />
       <window_info anchor="right" id="Remote Host" order="3" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.481409" visible="true" weight="0.1929182" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.481409" visible="true" weight="0.13065925" />
       <window_info anchor="bottom" id="Docker" order="12" show_stripe_button="false" />
       <window_info anchor="right" id="Database" order="3" />
-      <window_info anchor="right" id="SciView" order="3" sideWeight="0.4989496" visible="true" weight="0.010378511" />
+      <window_info anchor="right" id="SciView" order="3" sideWeight="0.4989496" visible="true" weight="0.08339953" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" sideWeight="0.518591" side_tool="true" weight="0.16483517" />
-      <window_info anchor="bottom" id="Debug" order="5" weight="0.29936975" />
+      <window_info anchor="bottom" id="Debug" order="5" weight="0.29880774" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="4" weight="0.4" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
@@ -295,7 +332,6 @@
       <window_info anchor="right" x="0" y="0" width="370" height="850" id="Documentation" order="3" sideWeight="0.5010504" side_tool="true" visible="true" weight="0.010378511" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Cvs" order="3" weight="0.25" />
-      <window_info anchor="bottom" id="File Transfer" order="13" weight="0.33613446" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.23232323" />
     </layout>
   </component>
@@ -329,7 +365,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Model/src/data_utils.py</url>
-          <line>532</line>
+          <line>536</line>
           <option name="timeStamp" value="46" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -339,7 +375,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Model/util/change_name.py</url>
-          <line>17</line>
+          <line>6</line>
           <option name="timeStamp" value="56" />
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
@@ -349,11 +385,21 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
           <url>file://$PROJECT_DIR$/Model/src/predict_3dpose_eccv18.py</url>
-          <line>359</line>
+          <line>361</line>
           <option name="timeStamp" value="93" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Model/util/change_name.py</url>
+          <line>32</line>
+          <option name="timeStamp" value="94" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Model/src/predict_3dpose_eccv18.py</url>
+          <line>134</line>
+          <option name="timeStamp" value="98" />
+        </line-breakpoint>
       </breakpoints>
-      <option name="time" value="94" />
+      <option name="time" value="100" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
@@ -607,35 +653,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Model/util/change_name.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="144">
-          <caret line="8" column="5" lean-forward="true" selection-start-line="8" selection-start-column="5" selection-end-line="8" selection-end-column="5" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Model/.gitignore">
       <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Model/util/generate_file_list.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="216">
-          <caret line="13" selection-start-line="13" selection-end-line="24" />
-          <folding>
-            <element signature="e#0#9#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/Library/Caches/PyCharm2018.1/remote_sources/-1340077647/-1227933812/tensorflow/python/platform/app.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2088">
-          <caret line="125" selection-start-line="125" selection-end-line="125" />
-        </state>
-      </provider>
     </entry>
     <entry file="file://$USER_HOME$/Library/Caches/PyCharm2018.1/remote_sources/-1340077647/-1227933812/absl/flags/_flag.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -675,16 +694,6 @@
     <entry file="file://$PROJECT_DIR$/Model/src/cameras.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/Model/src/predict_3dpose.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="8064">
-          <caret line="469" column="52" selection-start-line="469" selection-start-column="52" selection-end-line="469" selection-end-column="52" />
-          <folding>
-            <element signature="e#43#81#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Model/src/procrustes.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="486">
@@ -699,30 +708,67 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Model/util/generate_file_list.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="252">
+          <caret line="14" selection-start-line="14" selection-end-line="16" selection-end-column="109" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Model/util/change_name.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="72">
+          <caret line="4" selection-start-line="4" selection-end-line="24" />
+          <folding>
+            <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/Library/Caches/PyCharm2018.1/remote_sources/-1340077647/-1227933812/tensorflow/python/platform/app.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="744">
+          <caret line="125" selection-start-line="125" selection-end-line="125" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Model/src/data_utils.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="10854">
-          <caret line="615" selection-start-line="615" selection-end-line="615" />
+        <state relative-caret-position="532">
+          <caret line="153" selection-start-line="153" selection-end-line="153" />
           <folding>
             <element signature="e#59#90#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Model/src/predict_3dpose_eccv18.py">
+    <entry file="file://$PROJECT_DIR$/Model/src/linear_model.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="738">
-          <caret line="63" selection-start-line="63" selection-end-line="63" />
+        <state relative-caret-position="2664">
+          <caret line="378" column="14" selection-start-line="378" selection-start-column="14" selection-end-line="378" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Model/src/predict_3dpose.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="7769">
+          <caret line="469" column="52" selection-start-line="469" selection-start-column="52" selection-end-line="469" selection-end-column="52" />
           <folding>
             <element signature="e#43#81#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Model/src/linear_model.py">
+    <entry file="file://$PROJECT_DIR$/Model/src/predict_3dpose_eccv18.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="444">
-          <caret line="419" column="32" selection-start-line="419" selection-start-column="32" selection-end-line="419" selection-end-column="32" />
+        <state relative-caret-position="199">
+          <caret line="30" column="46" selection-start-line="30" selection-start-column="42" selection-end-line="30" selection-end-column="46" />
+          <folding>
+            <element signature="e#43#81#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

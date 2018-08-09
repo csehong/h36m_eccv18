@@ -27,13 +27,13 @@ import csv
 
 
 tf.app.flags.DEFINE_float("learning_rate", 1e-3, "Learning rate")
-tf.app.flags.DEFINE_float("dropout", 1, "Dropout keep probability. 1 means no dropout")
+tf.app.flags.DEFINE_float("dropout", 1.0, "Dropout keep probability. 1 means no dropout")
 tf.app.flags.DEFINE_integer("batch_size", 7025, "Batch size to use during training")
 tf.app.flags.DEFINE_integer("epochs", 600, "How many epochs we should train for")
 tf.app.flags.DEFINE_boolean("camera_frame", False, "Convert 3d poses to camera coordinates")
 tf.app.flags.DEFINE_boolean("max_norm", True  , "Apply maxnorm constraint to the weights")
 tf.app.flags.DEFINE_boolean("batch_norm", True, "Use batch_normalization")
-tf.app.flags.DEFINE_boolean("centering_2d", True, "Use centering 2d around root")
+tf.app.flags.DEFINE_boolean("centering_2d", False, "Use centering 2d around root")
 
 # Data loading
 tf.app.flags.DEFINE_boolean("predict_14", False, "predict 14 joints")
@@ -51,7 +51,8 @@ tf.app.flags.DEFINE_boolean("evaluateActionWise",False, "The dataset to use eith
 
 # Directories
 tf.app.flags.DEFINE_string("cameras_path","data/h36m/cameras.h5","Directory to load camera parameters")
-tf.app.flags.DEFINE_string("data_dir",   "data/h36m_muzi/", "Data directory")
+tf.app.flags.DEFINE_string("data_dir",   "data/h36m_eccv18_challenge/", "Data directory")  #data/h36m_muzi data/h36m_eccv18_challenge/
+tf.app.flags.DEFINE_string("detector_2d",   "cpm", "2D pose detector name") #GT_pose_2d   cpm
 tf.app.flags.DEFINE_string("train_dir", "experiments_eccv18", "Training directory.")
 tf.app.flags.DEFINE_string("prediction_dir", "eccv18_out/", "3D prediction directory")
 
@@ -59,7 +60,7 @@ tf.app.flags.DEFINE_string("prediction_dir", "eccv18_out/", "3D prediction direc
 # Train or load
 tf.app.flags.DEFINE_string("mode", 'train', "Experiment mode") # train / eval / generate
 tf.app.flags.DEFINE_boolean("use_cpu", False, "Whether to use the CPU")
-tf.app.flags.DEFINE_integer("load", 0, "Try to load a previous checkpoint.") #7800
+tf.app.flags.DEFINE_integer("load", 2400, "Try to load a previous checkpoint.") #7800 2400
 
 
 
@@ -80,7 +81,7 @@ train_dir = os.path.join( FLAGS.train_dir,
   'procrustes' if FLAGS.procrustes else 'no_procrustes',
   'maxnorm' if FLAGS.max_norm else 'no_maxnorm',
   'batch_normalization' if FLAGS.batch_norm else 'no_batch_normalization',
-  'use_stacked_hourglass' if FLAGS.use_sh else 'not_stacked_hourglass',
+  '{0}'.format(FLAGS.detector_2d),
   'predict_14' if FLAGS.predict_14 else 'predict_17',
   'center_2d' if FLAGS.centering_2d else 'not_center_2d')
 
@@ -126,6 +127,7 @@ def create_model( session, actions, batch_size, centering_2d = False, for_eccv18
     session.run( tf.global_variables_initializer() )
     return model
 
+
   # Load a previously saved model
   ckpt = tf.train.get_checkpoint_state( train_dir, latest_filename="checkpoint")
   print( "train_dir", train_dir )
@@ -157,11 +159,11 @@ def train_eccv18():
 
   # Load 3d data
   train_set_3d, test_set_3d, data_mean_3d, data_std_3d, dim_to_ignore_3d, dim_to_use_3d  = data_utils.read_data_eccv18(
-    FLAGS.data_dir, FLAGS.centering_2d, dim=3)
+    FLAGS.data_dir, FLAGS.centering_2d, FLAGS.detector_2d, dim=3)
 
 
   train_set_2d, test_set_2d, data_mean_2d, data_std_2d, dim_to_ignore_2d, dim_to_use_2d = data_utils.read_data_eccv18(
-    FLAGS.data_dir, FLAGS.centering_2d, dim=2)
+    FLAGS.data_dir, FLAGS.centering_2d, FLAGS.detector_2d, dim=2)
 
   # Avoid using the GPU if requested
   device_count = {"GPU": 2} if FLAGS.use_cpu else {"GPU": 0}
@@ -386,11 +388,11 @@ def eval_eccv18():
 
   # Load 3d data
   train_set_3d, test_set_3d, data_mean_3d, data_std_3d, dim_to_ignore_3d, dim_to_use_3d  = data_utils.read_data_eccv18(
-    FLAGS.data_dir, FLAGS.centering_2d, dim=3)
+    FLAGS.data_dir, FLAGS.centering_2d, FLAGS.detector_2d, dim=3)
 
 
   train_set_2d, test_set_2d, data_mean_2d, data_std_2d, dim_to_ignore_2d, dim_to_use_2d = data_utils.read_data_eccv18(
-    FLAGS.data_dir, FLAGS.centering_2d, dim=2)
+    FLAGS.data_dir, FLAGS.centering_2d, FLAGS.detector_2d, dim=2)
 
 
   device_count = {"GPU": 2} if FLAGS.use_cpu else {"GPU": 1}
@@ -428,10 +430,10 @@ def generate_3dpose_eccv18():
 
   # Load 3d & 2d data
   _, _, data_mean_3d, data_std_3d, dim_to_ignore_3d, dim_to_use_3d  = data_utils.read_data_eccv18(
-    FLAGS.data_dir, FLAGS.centering_2d, dim=3)
+    FLAGS.data_dir, FLAGS.centering_2d, FLAGS.detector_2d, dim=3, for_submission = True)
 
   train_set_2d, test_set_2d, data_mean_2d, data_std_2d, dim_to_ignore_2d, dim_to_use_2d = data_utils.read_data_eccv18(
-    FLAGS.data_dir, FLAGS.centering_2d, dim=2)
+    FLAGS.data_dir, FLAGS.centering_2d, FLAGS.detector_2d, dim=2, for_submission = True)
 
 
   # Load test filename_list (Unshuffled)

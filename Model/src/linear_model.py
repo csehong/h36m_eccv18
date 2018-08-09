@@ -417,7 +417,7 @@ class LinearModel(object):
       encoder_inputs  = encoder_inputs_ori[:-n_extra, :]
       encoder_inputs_extra = encoder_inputs_ori[-n_extra:, :]
     n_batches = n // self.batch_size
-    encoder_inputs  = np.split( encoder_inputs, n_batches )
+    encoder_inputs  = np.split(encoder_inputs, n_batches )
     encoder_inputs.append(encoder_inputs_extra)
 
     return encoder_inputs

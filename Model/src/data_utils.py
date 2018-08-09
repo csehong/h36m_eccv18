@@ -120,7 +120,7 @@ def load_data( bpath, subjects, actions, dim=3 ):
   return data
 
 
-def load_data_eccv18(bpath, train_test, dim):
+def load_data_eccv18(bpath, train_test, detector_2d, dim):
   """
   Loads 2d ground truth from disk, and puts it in an easy-to-acess dictionary
 
@@ -138,19 +138,23 @@ def load_data_eccv18(bpath, train_test, dim):
 
   # Load filename_list according to split (train/val)
   file_list = []
-  split_path = os.path.join(bpath, "split", train_test + '_list.csv')
+  if detector_2d == "GT_pose_2d":
+    split_path = os.path.join(bpath, "split", train_test + '_list.csv')
+  else:
+    split_path = os.path.join(bpath, "split", train_test + '_list_' + detector_2d + '.csv')
 
   with open(split_path, 'r') as f:
     csvReader = csv.reader(f)
     for row in csvReader:
-      file_list.append(row[0].split('.jp')[0])
+      # file_list.append(row[0].split('.jp')[0])
+      file_list.append(row)
 
 
   # Load 2D/3D value
   pose_path = os.path.join(bpath, "pose_" + str(dim) + "d")
   pose_list = [None] * len(file_list)
   for idx, filename in enumerate(file_list):
-    filename_full = os.path.join(pose_path, filename+'.csv')
+    filename_full = os.path.join(pose_path, filename[0]+'.csv')
     # print(filename_full)
     pose = genfromtxt(filename_full, delimiter=',')
     pose_list[idx] = pose
@@ -590,7 +594,7 @@ def read_3d_data( actions, data_dir, camera_frame, rcams, predict_14=False ):
   return train_set, test_set, data_mean, data_std, dim_to_ignore, dim_to_use, train_root_positions, test_root_positions
 
 
-def read_data_eccv18(data_dir, centering_2d, dim):
+def read_data_eccv18(data_dir, centering_2d, detector_2d, dim, for_submission = False):
   """
   Loads 3d poses, zero-centres and normalizes them
 
@@ -605,8 +609,11 @@ def read_data_eccv18(data_dir, centering_2d, dim):
     dim_to_use: list with the dimensions to predict
   """
   # Load 2d/3d data
-  train_set = load_data_eccv18( data_dir, "Train", dim)
-  test_set  = load_data_eccv18( data_dir, "Test",  dim)
+  train_set = load_data_eccv18( data_dir, "Train", detector_2d, dim)
+  if (for_submission == True):
+    test_set  = load_data_eccv18( data_dir, "Test", detector_2d, dim)
+  else:
+    test_set  = load_data_eccv18( data_dir, "Val", detector_2d, dim)
 
   # Apply 2d/3d post-processing (centering around root)
   if dim > 2:
