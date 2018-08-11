@@ -3,8 +3,8 @@ import csv
 
 
 # set path
-split_info = 'Val'
-path_root = '../src/data/h36m_eccv18/' +split_info + '/POSE2D/'
+split_info = 'Test'
+path_root = '../src/data/h36m_eccv18/' +split_info + '/IMG/'
 
 # get file list from path
 file_list = os.listdir(path_root)

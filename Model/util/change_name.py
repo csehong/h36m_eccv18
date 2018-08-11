@@ -5,9 +5,9 @@ from os import rename
 
 
 # set path
-split_info = 'Train'
+split_info = 'Test'
 path_root = '../src/data/h36m_eccv18/'
-path_dir =  path_root + split_info + '/POSE2D'
+path_dir =  path_root + split_info + '/IMG'
 
 # get file list from path
 file_list = os.listdir(path_dir)

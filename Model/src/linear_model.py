@@ -170,7 +170,7 @@ class LinearModel(object):
     self.learning_rate_summary = tf.summary.scalar('learning_rate/learning_rate', self.learning_rate)
 
     # To save the model
-    self.saver = tf.train.Saver( tf.global_variables(), max_to_keep=10 )
+    self.saver = tf.train.Saver( tf.global_variables(), max_to_keep=3 )
 
 
   def two_linear( self, xin, linear_size, residual, dropout_keep_prob, max_norm, batch_norm, dtype, idx ):

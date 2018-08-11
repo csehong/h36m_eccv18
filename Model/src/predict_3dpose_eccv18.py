@@ -27,13 +27,13 @@ import csv
 
 
 tf.app.flags.DEFINE_float("learning_rate", 1e-3, "Learning rate")
-tf.app.flags.DEFINE_float("dropout", 1.0, "Dropout keep probability. 1 means no dropout")
+tf.app.flags.DEFINE_float("dropout", 0.7, "Dropout keep probability. 1 means no dropout")
 tf.app.flags.DEFINE_integer("batch_size", 7025, "Batch size to use during training")
 tf.app.flags.DEFINE_integer("epochs", 600, "How many epochs we should train for")
 tf.app.flags.DEFINE_boolean("camera_frame", False, "Convert 3d poses to camera coordinates")
 tf.app.flags.DEFINE_boolean("max_norm", True  , "Apply maxnorm constraint to the weights")
 tf.app.flags.DEFINE_boolean("batch_norm", True, "Use batch_normalization")
-tf.app.flags.DEFINE_boolean("centering_2d", False, "Use centering 2d around root")
+tf.app.flags.DEFINE_boolean("centering_2d",  True , "Use centering 2d around root")
 
 # Data loading
 tf.app.flags.DEFINE_boolean("predict_14", False, "predict 14 joints")
@@ -46,6 +46,7 @@ tf.app.flags.DEFINE_integer("num_layers", 3, "Number of layers in the model.")
 tf.app.flags.DEFINE_boolean("residual", True, "Whether to add a residual connection every 2 layers")
 
 # Evaluation
+tf.app.flags.DEFINE_boolean("for_submission", False, "Whether to use Test(true) or Val(not)")
 tf.app.flags.DEFINE_boolean("procrustes", False, "Apply procrustes analysis at test time")
 tf.app.flags.DEFINE_boolean("evaluateActionWise",False, "The dataset to use either h36m or heva")
 
@@ -60,7 +61,7 @@ tf.app.flags.DEFINE_string("prediction_dir", "eccv18_out/", "3D prediction direc
 # Train or load
 tf.app.flags.DEFINE_string("mode", 'train', "Experiment mode") # train / eval / generate
 tf.app.flags.DEFINE_boolean("use_cpu", False, "Whether to use the CPU")
-tf.app.flags.DEFINE_integer("load", 2400, "Try to load a previous checkpoint.") #7800 2400
+tf.app.flags.DEFINE_integer("load", 1975, "Try to load a previous checkpoint.") #7800 2400
 
 
 
@@ -399,8 +400,10 @@ def eval_eccv18():
   with tf.Session(config=tf.ConfigProto( device_count = device_count )) as sess:
     # === Create the model ===
     print("Creating %d layers of %d units." % (FLAGS.num_layers, FLAGS.linear_size))
-    model = create_model(sess, actions, FLAGS.batch_size, for_eccv18=True)
+    model = create_model(sess, actions, FLAGS.batch_size, FLAGS.centering_2d, for_eccv18=True)
     print("Model loaded")
+
+
 
     n_joints = 17 if not (FLAGS.predict_14) else 14
     encoder_inputs, decoder_outputs = model.get_all_batches_eccv18(test_set_2d, test_set_3d, training=False)
@@ -428,17 +431,23 @@ def generate_3dpose_eccv18():
 
   actions = data_utils.define_actions( FLAGS.action )
 
+
   # Load 3d & 2d data
   _, _, data_mean_3d, data_std_3d, dim_to_ignore_3d, dim_to_use_3d  = data_utils.read_data_eccv18(
-    FLAGS.data_dir, FLAGS.centering_2d, FLAGS.detector_2d, dim=3, for_submission = True)
+    FLAGS.data_dir, FLAGS.centering_2d, FLAGS.detector_2d, dim=3, for_submission = FLAGS.for_submission)
 
   train_set_2d, test_set_2d, data_mean_2d, data_std_2d, dim_to_ignore_2d, dim_to_use_2d = data_utils.read_data_eccv18(
-    FLAGS.data_dir, FLAGS.centering_2d, FLAGS.detector_2d, dim=2, for_submission = True)
+    FLAGS.data_dir, FLAGS.centering_2d, FLAGS.detector_2d, dim=2, for_submission = FLAGS.for_submission)
+
+
 
 
   # Load test filename_list (Unshuffled)
   file_list = []
-  split_path = os.path.join(FLAGS.data_dir, "split", 'Test_list.csv')
+  if (FLAGS.detector_2d == FLAGS.detector_2d):
+    split_path = os.path.join(FLAGS.data_dir, "split", 'Val_list.csv')
+  else:
+    split_path = os.path.join(FLAGS.data_dir, "split", 'Val_list_' + FLAGS.detector_2d +'.csv')
   with open(split_path, 'r') as f:
     csvReader = csv.reader(f)
     for row in csvReader:
@@ -449,7 +458,7 @@ def generate_3dpose_eccv18():
   with tf.Session(config=tf.ConfigProto( device_count = device_count )) as sess:
     # === Create the model ===
     print("Creating %d layers of %d units." % (FLAGS.num_layers, FLAGS.linear_size))
-    model = create_model(sess, actions, FLAGS.batch_size, for_eccv18=True)
+    model = create_model(sess, actions, FLAGS.batch_size, FLAGS.centering_2d, for_eccv18=True)
     print("Model loaded")
 
     n_joints = 17 if not (FLAGS.predict_14) else 14
