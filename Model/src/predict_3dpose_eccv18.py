@@ -27,8 +27,8 @@ import csv
 
 
 tf.app.flags.DEFINE_float("learning_rate", 1e-3, "Learning rate")
-tf.app.flags.DEFINE_float("dropout", 0.7, "Dropout keep probability. 1 means no dropout")
-tf.app.flags.DEFINE_integer("batch_size", 7025, "Batch size to use during training")
+tf.app.flags.DEFINE_float("dropout", 1.0, "Dropout keep probability. 1 means no dropout")
+tf.app.flags.DEFINE_integer("batch_size", 10000, "Batch size to use during training")
 tf.app.flags.DEFINE_integer("epochs", 600, "How many epochs we should train for")
 tf.app.flags.DEFINE_boolean("camera_frame", False, "Convert 3d poses to camera coordinates")
 tf.app.flags.DEFINE_boolean("max_norm", True  , "Apply maxnorm constraint to the weights")
@@ -55,13 +55,13 @@ tf.app.flags.DEFINE_string("cameras_path","data/h36m/cameras.h5","Directory to l
 tf.app.flags.DEFINE_string("data_dir",   "data/h36m_eccv18_challenge/", "Data directory")  #data/h36m_muzi data/h36m_eccv18_challenge/
 tf.app.flags.DEFINE_string("detector_2d",   "cpm", "2D pose detector name") #GT_pose_2d   cpm
 tf.app.flags.DEFINE_string("train_dir", "experiments_eccv18", "Training directory.")
-tf.app.flags.DEFINE_string("prediction_dir", "eccv18_out/", "3D prediction directory")
+tf.app.flags.DEFINE_string("prediction_dir", "eccv18_subm_1/", "3D prediction directory")
 
 
 # Train or load
 tf.app.flags.DEFINE_string("mode", 'train', "Experiment mode") # train / eval / generate
 tf.app.flags.DEFINE_boolean("use_cpu", False, "Whether to use the CPU")
-tf.app.flags.DEFINE_integer("load", 1975, "Try to load a previous checkpoint.") #7800 2400
+tf.app.flags.DEFINE_integer("load", 0, "Try to load a previous checkpoint.") #7800 2400
 
 
 
@@ -86,7 +86,8 @@ train_dir = os.path.join( FLAGS.train_dir,
   'predict_14' if FLAGS.predict_14 else 'predict_17',
   'center_2d' if FLAGS.centering_2d else 'not_center_2d')
 
-print( train_dir )
+
+print (train_dir)
 summaries_dir = os.path.join( train_dir, "log" ) # Directory for TB summaries
 
 # To avoid race conditions: https://github.com/tensorflow/tensorflow/issues/7448
@@ -128,7 +129,6 @@ def create_model( session, actions, batch_size, centering_2d = False, for_eccv18
     session.run( tf.global_variables_initializer() )
     return model
 
-
   # Load a previously saved model
   ckpt = tf.train.get_checkpoint_state( train_dir, latest_filename="checkpoint")
   print( "train_dir", train_dir )
@@ -141,16 +141,21 @@ def create_model( session, actions, batch_size, centering_2d = False, for_eccv18
       else:
         raise ValueError("Asked to load checkpoint {0}, but it does not seem to exist".format(FLAGS.load))
     else:
-      ckpt_name = os.path.basename( ckpt.model_checkpoint_path )
+      ckpt_name = os.path.basename( ckpt.model_checkpoint_na )
 
-    print("Loading model {0}".format( ckpt_name ))
-    model.saver.restore( session, ckpt.model_checkpoint_path )
+    print("Loading model {0}".format( ckpt_name))
+    # model.saver.restore( session, ckpt.model_checkpoint_path ) # critical error
+    model.saver.restore(session, ckpt_name)  # critical error
+
     return model
   else:
     print("Could not find checkpoint. Aborting.")
     raise( ValueError, "Checkpoint {0} does not seem to exist".format( ckpt.model_checkpoint_path ) )
 
   return model
+
+
+
 
 def train_eccv18():
   """Train a linear model for 3d pose estimation"""
@@ -177,7 +182,7 @@ def train_eccv18():
     print("Creating %d bi-layers of %d units." % (FLAGS.num_layers, FLAGS.linear_size))
     model = create_model( sess, actions, FLAGS.batch_size, FLAGS.centering_2d, for_eccv18=True)
     model.train_writer.add_graph( sess.graph )
-    print("Model created")
+    print("Model (%d step) created" %FLAGS.load)
 
     #=== This is the training loop ===
     step_time, loss, val_loss = 0.0, 0.0, 0.0
@@ -255,11 +260,11 @@ def train_eccv18():
       model.test_writer.add_summary( summaries, current_step )
 
       # Save the model
-      print( "Saving the model... ", end="" )
+      print("Saving the model... ", end="")
       start_time = time.time()
-      model.saver.save(sess, os.path.join(train_dir, 'checkpoint'), global_step=current_step )
+      model.saver.save(sess, os.path.join(train_dir, 'checkpoint'), global_step=current_step)
       # model.saver.save(sess, os.path.join(train_dir, 'checkpoint'))
-      print( "done in {0:.2f} ms".format(1000*(time.time() - start_time)) )
+      print("done in {0:.2f} ms".format(1000 * (time.time() - start_time)))
 
       print(train_dir)
 
@@ -444,14 +449,15 @@ def generate_3dpose_eccv18():
 
   # Load test filename_list (Unshuffled)
   file_list = []
-  if (FLAGS.detector_2d == FLAGS.detector_2d):
-    split_path = os.path.join(FLAGS.data_dir, "split", 'Val_list.csv')
-  else:
+  if (FLAGS.for_submission == False):
     split_path = os.path.join(FLAGS.data_dir, "split", 'Val_list_' + FLAGS.detector_2d +'.csv')
+  else:
+    split_path = os.path.join(FLAGS.data_dir, "split", 'Test_list_' + FLAGS.detector_2d +'.csv')
   with open(split_path, 'r') as f:
     csvReader = csv.reader(f)
     for row in csvReader:
-      file_list.append(row[0].split('.jp')[0])
+      # file_list.append(row[0].split('.jp')[0])
+      file_list.append(row)
 
   device_count = {"GPU": 2} if FLAGS.use_cpu else {"GPU": 1}
   idx_file =0
@@ -483,7 +489,8 @@ def generate_3dpose_eccv18():
 
       for i in range(batch_size):
         pose3d_sample = poses3d[i].reshape(n_joints, -1)
-        np.savetxt(FLAGS.prediction_dir + file_list[idx_file] + ".csv", pose3d_sample, delimiter=",", fmt='%.3f')
+        print( FLAGS.prediction_dir + file_list[idx_file][0] + ".csv")
+        np.savetxt(FLAGS.prediction_dir + file_list[idx_file][0] + ".csv", pose3d_sample, delimiter=",", fmt='%.3f')
         idx_file +=1
 
 
