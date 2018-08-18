@@ -24,17 +24,22 @@ import cameras
 import data_utils
 import linear_model
 import csv
+import os, glob, json, tqdm
+import numpy as np
+import pandas as pd
 
 
 tf.app.flags.DEFINE_float("learning_rate", 1e-3, "Learning rate")
 tf.app.flags.DEFINE_float("dropout", 1.0, "Dropout keep probability. 1 means no dropout")
-tf.app.flags.DEFINE_integer("batch_size", 7025, "Batch size to use during training")
-tf.app.flags.DEFINE_integer("epochs", 700, "How many epochs we should train for")
-tf.app.flags.DEFINE_integer("period_step_eval", 30, "Step period for evaluation and save")
+tf.app.flags.DEFINE_integer("batch_size", 25000, "Batch size to use during training")
+tf.app.flags.DEFINE_integer("epochs", 200, "How many epochs we should train for")
+tf.app.flags.DEFINE_integer("period_epoch_eval", 5, "Epoch period for evaluation and save")
 tf.app.flags.DEFINE_boolean("max_norm", True  , "Apply maxnorm constraint to the weights")
 tf.app.flags.DEFINE_boolean("batch_norm", True, "Use batch_normalization")
 tf.app.flags.DEFINE_boolean("centering_2d",  True , "Use centering 2d around root")
 tf.app.flags.DEFINE_string("optimizer", "Adam", "Optimizer to use") # SGD / Adam
+tf.app.flags.DEFINE_integer("idx_split", 3, "index for splitubg train_val list") # -1 ~ 7   -1: original split   0~7: newly added split
+
 
 # Data loading
 tf.app.flags.DEFINE_boolean("predict_14", False, "predict 14 joints")
@@ -46,22 +51,21 @@ tf.app.flags.DEFINE_integer("num_layers", 3, "Number of layers in the model.")
 tf.app.flags.DEFINE_boolean("residual", True, "Whether to add a residual connection every 2 layers")
 
 # Evaluation
-tf.app.flags.DEFINE_boolean("for_submission", False, "Whether to use Test(true) or Val(not)")
+tf.app.flags.DEFINE_boolean("for_submission", True, "Whether to use Test(true) or Val(not)")
 tf.app.flags.DEFINE_boolean("procrustes", False, "Apply procrustes analysis at test time")
 tf.app.flags.DEFINE_boolean("evaluateActionWise",False, "The dataset to use either h36m or heva")
 
 # Directories
 tf.app.flags.DEFINE_string("cameras_path","data/h36m/cameras.h5","Directory to load camera parameters")
-tf.app.flags.DEFINE_string("data_dir",   "data/h36m_muzi/", "Data directory")  #data/h36m_muzi     data/h36m_eccv18_challenge/
-tf.app.flags.DEFINE_string("detector_2d",   "GT_pose_2d", "2D pose detector name") #GT_pose_2d   cpm
+tf.app.flags.DEFINE_string("data_dir",   "data/h36m_eccv18_challenge/", "Data directory")  #data/h36m_muzi     data/h36m_eccv18_challenge/
+tf.app.flags.DEFINE_string("detector_2d",   "cpm", "2D pose detector name") #GT_pose_2d   cpm
 tf.app.flags.DEFINE_string("train_dir", "experiments_eccv18", "Training directory.")
-tf.app.flags.DEFINE_string("prediction_dir", "eccv18_subm_2", "3D prediction directory")
-
+tf.app.flags.DEFINE_string("prediction_dir", "eccv18_out", "3D prediction directory")
 
 # Train or load
-tf.app.flags.DEFINE_string("mode", 'train', "Experiment mode") # train / eval / generate
+tf.app.flags.DEFINE_string("mode", 'generate', "Experiment mode") # train / eval / generate
 tf.app.flags.DEFINE_boolean("use_cpu", False, "Whether to use the CPU")
-tf.app.flags.DEFINE_integer("load", 0, "Try to load a previous checkpoint.") #7800 2400
+tf.app.flags.DEFINE_integer("load", 1230, "Try to load a previous checkpoint.") #7800 2400
 
 
 
@@ -70,9 +74,14 @@ tf.app.flags.DEFINE_boolean("use_fp16", False, "Train using fp16 instead of fp32
 
 FLAGS = tf.app.flags.FLAGS
 
+
+
+FLAGS.prediction_dir = FLAGS.prediction_dir + "_" + str(FLAGS.idx_split)
+
+
 train_dir = os.path.join( FLAGS.train_dir,
   FLAGS.action,
-  'opt_{0}'.format(FLAGS.optimizer),
+  'split_{0}'.format(FLAGS.idx_split),
   'dropout_{0}'.format(FLAGS.dropout),
   'epochs_{0}'.format(FLAGS.epochs) if FLAGS.epochs > 0 else '',
   'lr_{0}'.format(FLAGS.learning_rate),
@@ -167,14 +176,15 @@ def train_eccv18():
 
   # Load 3d data
   train_set_3d, test_set_3d, data_mean_3d, data_std_3d, dim_to_ignore_3d, dim_to_use_3d  = data_utils.read_data_eccv18(
-    FLAGS.data_dir, FLAGS.centering_2d, FLAGS.detector_2d, dim=3)
+    FLAGS.data_dir, FLAGS.centering_2d, FLAGS.detector_2d, FLAGS.idx_split, dim=3)
 
 
   train_set_2d, test_set_2d, data_mean_2d, data_std_2d, dim_to_ignore_2d, dim_to_use_2d = data_utils.read_data_eccv18(
-    FLAGS.data_dir, FLAGS.centering_2d, FLAGS.detector_2d, dim=2)
+    FLAGS.data_dir, FLAGS.centering_2d, FLAGS.detector_2d, FLAGS.idx_split, dim=2)
 
   # Avoid using the GPU if requested
-  device_count = {"GPU": 2} if FLAGS.use_cpu else {"GPU": 0}
+  device_count = {"GPU": FLAGS.idx_split} if FLAGS.use_cpu else {"GPU": 0}
+  # device_count = {"GPU": 3} if FLAGS.use_cpu else {"GPU": 0}
   with tf.Session(config=tf.ConfigProto(
     device_count=device_count,
     allow_soft_placement=True )) as sess:
@@ -195,7 +205,7 @@ def train_eccv18():
     current_epoch = 0
     log_every_n_batches = 2
 
-    for _ in xrange( FLAGS.epochs ):
+    for i_epoch in xrange( FLAGS.epochs ):
       current_epoch = current_epoch + 1
 
       # === Load training batches for one epoch ===
@@ -205,6 +215,9 @@ def train_eccv18():
       start_time, loss = time.time(), 0.
 
       g_step = model.global_step.eval()
+      print("g_step: ", g_step)
+      print("i_epoch: ", i_epoch)
+
 
       # === Loop through all the training batches ===
       for i in range( nbatches ):
@@ -242,7 +255,7 @@ def train_eccv18():
 
 
       # === Testing after this epoch ===
-      if g_step % FLAGS.period_step_eval == 0:
+      if i_epoch % FLAGS.period_epoch_eval == 0:
         isTraining = False
         n_joints = 17 if not(FLAGS.predict_14) else 14
         encoder_inputs, decoder_outputs = model.get_all_batches_eccv18( test_set_2d, test_set_3d, training=False)
@@ -273,11 +286,6 @@ def train_eccv18():
         model.saver.save(sess, os.path.join(train_dir, 'checkpoint'), global_step=current_step)
         # model.saver.save(sess, os.path.join(train_dir, 'checkpoint'))
         print("done in {0:.2f} ms".format(1000 * (time.time() - start_time)))
-
-
-
-        # Reset global time and loss
-        step_time, loss = 0, 0
 
         sys.stdout.flush()
 
@@ -333,11 +341,15 @@ def evaluate_batches( sess, model,
   n_joints = 17 if not(FLAGS.predict_14) else 14
   nbatches = len( encoder_inputs )
 
+  if nbatches == 1:
+    batch_size_eval = encoder_inputs[0].shape[0]
+  else:
+    batch_size_eval = FLAGS.batch_size
+
   # Loop through test examples
   all_dists, start_time, loss = [], time.time(), 0.
   log_every_n_batches = 100
   for i in range(nbatches):
-
 
     enc_in, dec_out = encoder_inputs[i], decoder_outputs[i]
     dp = 1.0 # dropout keep probability is always 1 at test time
@@ -355,15 +367,18 @@ def evaluate_batches( sess, model,
     dec_out = dec_out[:, dtu3d]
     poses3d = poses3d[:, dtu3d]
 
-    print (dec_out.shape[0], FLAGS.batch_size)
-    print (poses3d.shape[0],FLAGS.batch_size)
+    print ("dec_out" ,dec_out.shape[0], batch_size_eval)
+    print ("poses3d", poses3d.shape[0], batch_size_eval)
 
-    assert dec_out.shape[0] == FLAGS.batch_size
-    assert poses3d.shape[0] == FLAGS.batch_size
+    # assert dec_out.shape[0] == FLAGS.batch_size
+    # assert poses3d.shape[0] == FLAGS.batch_size
+    assert dec_out.shape[0] == batch_size_eval
+    assert poses3d.shape[0] == batch_size_eval
+
 
     if FLAGS.procrustes:
       # Apply per-frame procrustes alignment if asked to do so
-      for j in range(FLAGS.batch_size):
+      for j in range(batch_size_eval):
         gt  = np.reshape(dec_out[j,:],[-1,3])
         out = np.reshape(poses3d[j,:],[-1,3])
         _, Z, T, b, c = procrustes.compute_similarity_transform(gt,out,compute_optimal_scale=True)
@@ -381,7 +396,7 @@ def evaluate_batches( sess, model,
       dist_idx = dist_idx + 1
 
     all_dists.append(dists)
-    assert sqerr.shape[0] == FLAGS.batch_size
+    assert sqerr.shape[0] == batch_size_eval
 
   # error[i] = np.mean(np.sqrt(np.sum((gtPose - predPose) ** 2, axis=1)))
 
@@ -394,9 +409,12 @@ def evaluate_batches( sess, model,
 
   # Error per joint and total for all passed batches
   joint_err = np.mean( all_dists, axis=0 )
-  total_err = np.mean( all_dists )
+  # total_err = np.mean( all_dists )
+  person_err = np.mean( all_dists, axis=1 )
+  total_err_person = np.mean(person_err)
 
-  return total_err, joint_err, step_time, loss
+  return total_err_person, joint_err, step_time, loss
+
 
 
 def eval_eccv18():
@@ -406,14 +424,15 @@ def eval_eccv18():
 
   # Load 3d data
   train_set_3d, test_set_3d, data_mean_3d, data_std_3d, dim_to_ignore_3d, dim_to_use_3d  = data_utils.read_data_eccv18(
-    FLAGS.data_dir, FLAGS.centering_2d, FLAGS.detector_2d, dim=3)
+    FLAGS.data_dir, FLAGS.centering_2d, FLAGS.detector_2d, FLAGS.idx_split, dim=3)
 
 
   train_set_2d, test_set_2d, data_mean_2d, data_std_2d, dim_to_ignore_2d, dim_to_use_2d = data_utils.read_data_eccv18(
-    FLAGS.data_dir, FLAGS.centering_2d, FLAGS.detector_2d, dim=2)
+    FLAGS.data_dir, FLAGS.centering_2d, FLAGS.detector_2d, FLAGS.idx_split, dim=2)
 
 
-  device_count = {"GPU": 2} if FLAGS.use_cpu else {"GPU": 1}
+  # device_count = {"GPU": 2} if FLAGS.use_cpu else {"GPU": 1}
+  device_count = {"GPU": FLAGS.idx_split} if FLAGS.use_cpu else {"GPU": 0}
   with tf.Session(config=tf.ConfigProto( device_count = device_count )) as sess:
     # === Create the model ===
     print("Creating %d layers of %d units." % (FLAGS.num_layers, FLAGS.linear_size))
@@ -453,19 +472,15 @@ def generate_3dpose_eccv18():
 
   if not (os.path.isdir(predict_step_dir)):
     os.makedirs(os.path.join(predict_step_dir))
-
-
   actions = data_utils.define_actions( FLAGS.action )
 
 
   # Load 3d & 2d data
   _, _, data_mean_3d, data_std_3d, dim_to_ignore_3d, dim_to_use_3d  = data_utils.read_data_eccv18(
-    FLAGS.data_dir, FLAGS.centering_2d, FLAGS.detector_2d, dim=3, for_submission = FLAGS.for_submission)
+    FLAGS.data_dir, FLAGS.centering_2d, FLAGS.detector_2d, FLAGS.idx_split, dim=3, for_submission = FLAGS.for_submission)
 
   train_set_2d, test_set_2d, data_mean_2d, data_std_2d, dim_to_ignore_2d, dim_to_use_2d = data_utils.read_data_eccv18(
-    FLAGS.data_dir, FLAGS.centering_2d, FLAGS.detector_2d, dim=2, for_submission = FLAGS.for_submission)
-
-
+    FLAGS.data_dir, FLAGS.centering_2d, FLAGS.detector_2d, FLAGS.idx_split, dim=2, for_submission = FLAGS.for_submission)
 
 
   # Load test filename_list (Unshuffled)
@@ -480,7 +495,8 @@ def generate_3dpose_eccv18():
       # file_list.append(row[0].split('.jp')[0])
       file_list.append(row)
 
-  device_count = {"GPU": 2} if FLAGS.use_cpu else {"GPU": 1}
+  # device_count = {"GPU": 2} if FLAGS.use_cpu else {"GPU": 1}
+  device_count = {"GPU": FLAGS.idx_split} if FLAGS.use_cpu else {"GPU": 0}
   idx_file =0
   with tf.Session(config=tf.ConfigProto( device_count = device_count )) as sess:
     # === Create the model ===
@@ -514,6 +530,47 @@ def generate_3dpose_eccv18():
         np.savetxt(predict_step_dir +"/" + file_list[idx_file][0] + ".csv", pose3d_sample, delimiter=",", fmt='%.3f')
         idx_file +=1
 
+
+  # convert csv files to a json file
+  src_path = predict_step_dir
+  out_path = src_path + "_json"
+  # out_path = '_'.join(src_path.split("_")[ : 3]) + "_json"
+
+  # print (src_path, out_path, poses3d.shape)
+  # # save prediction results as a single CSV file
+  # if not (os.path.isdir(out_path)):
+  #   os.makedirs(os.path.join(out_path))
+  #
+  # np.savetxt(out_path + "/split_" + str(FLAGS.idx_split) + ".csv", poses3d, delimiter=",", fmt='%.3f')
+
+  csv2json(src_path, out_path)
+
+
+
+
+def csv2json(src_path, out_path):
+    if not(os.path.isdir(out_path)):
+        os.makedirs(out_path)
+
+
+    file_name = "result3d.json"
+    res_path = os.path.join(out_path, file_name)
+
+
+    csvs = sorted(glob.glob(src_path+'/*'))
+    results = {}
+
+    cnt = 0
+    for csv_file in tqdm.tqdm(csvs):
+        fn = os.path.basename(csv_file).split('.')[0].split('_')[1]
+        csv = pd.read_csv(csv_file, header=None)
+        joint = np.array(csv)
+        results.update({fn:joint.flatten().tolist()})
+        cnt += 1
+
+    with open(res_path, 'w') as outfile:
+      json_res = json.dumps([{"image_id":int(k), "keypoints":[v]} for k, v in sorted(results.items())])
+      outfile.write(json_res)
 
 
 def main(_):
