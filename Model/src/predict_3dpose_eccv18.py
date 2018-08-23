@@ -30,42 +30,41 @@ import pandas as pd
 
 
 tf.app.flags.DEFINE_float("learning_rate", 1e-3, "Learning rate")
-tf.app.flags.DEFINE_float("dropout", 1.0, "Dropout keep probability. 1 means no dropout")
-tf.app.flags.DEFINE_integer("batch_size", 25000, "Batch size to use during training")
-tf.app.flags.DEFINE_integer("epochs", 200, "How many epochs we should train for")
+tf.app.flags.DEFINE_float("dropout", 0.5, "Dropout keep probability. 1 means no dropout")
+tf.app.flags.DEFINE_integer("batch_size", 60000, "Batch size to use during training")
+tf.app.flags.DEFINE_integer("epochs", 7200, "How many epochs we should train for")
 tf.app.flags.DEFINE_integer("period_epoch_eval", 5, "Epoch period for evaluation and save")
 tf.app.flags.DEFINE_boolean("max_norm", True  , "Apply maxnorm constraint to the weights")
 tf.app.flags.DEFINE_boolean("batch_norm", True, "Use batch_normalization")
 tf.app.flags.DEFINE_boolean("centering_2d",  True , "Use centering 2d around root")
 tf.app.flags.DEFINE_string("optimizer", "Adam", "Optimizer to use") # SGD / Adam
-tf.app.flags.DEFINE_integer("idx_split", 3, "index for splitubg train_val list") # -1 ~ 7   -1: original split   0~7: newly added split
-
+tf.app.flags.DEFINE_integer("idx_split",  -1, "index for splitubg train_val list") # -1 ~ 7   -1: original split   0~7: newly added split
 
 # Data loading
 tf.app.flags.DEFINE_boolean("predict_14", False, "predict 14 joints")
 tf.app.flags.DEFINE_string("action","All", "The action to train on. 'All' means all the actions")
 
 # Architecture
-tf.app.flags.DEFINE_integer("linear_size", 2048, "Size of each model layer.")
-tf.app.flags.DEFINE_integer("num_layers", 3, "Number of layers in the model.")
+tf.app.flags.DEFINE_integer("linear_size", 1024, "Size of each model layer.")
+tf.app.flags.DEFINE_integer("num_layers", 2,  "Number of layers in the model.")
 tf.app.flags.DEFINE_boolean("residual", True, "Whether to add a residual connection every 2 layers")
 
 # Evaluation
-tf.app.flags.DEFINE_boolean("for_submission", True, "Whether to use Test(true) or Val(not)")
-tf.app.flags.DEFINE_boolean("procrustes", False, "Apply procrustes analysis at test time")
+tf.app.flags.DEFINE_boolean("for_submission", False, "Whether to use Test(true) or Val(not)")
+tf.app.flags.DEFINE_boolean("procrustes", True, "Apply procrustes analysis at test time")
 tf.app.flags.DEFINE_boolean("evaluateActionWise",False, "The dataset to use either h36m or heva")
 
 # Directories
 tf.app.flags.DEFINE_string("cameras_path","data/h36m/cameras.h5","Directory to load camera parameters")
 tf.app.flags.DEFINE_string("data_dir",   "data/h36m_eccv18_challenge/", "Data directory")  #data/h36m_muzi     data/h36m_eccv18_challenge/
 tf.app.flags.DEFINE_string("detector_2d",   "cpm", "2D pose detector name") #GT_pose_2d   cpm
-tf.app.flags.DEFINE_string("train_dir", "experiments_eccv18", "Training directory.")
+tf.app.flags.DEFINE_string("train_dir", "experiments_eccv18_1000_genuine", "Training directory.")
 tf.app.flags.DEFINE_string("prediction_dir", "eccv18_out", "3D prediction directory")
 
 # Train or load
-tf.app.flags.DEFINE_string("mode", 'generate', "Experiment mode") # train / eval / generate
+tf.app.flags.DEFINE_string("mode", 'train', "Experiment mode") # train / eval / generate
 tf.app.flags.DEFINE_boolean("use_cpu", False, "Whether to use the CPU")
-tf.app.flags.DEFINE_integer("load", 1230, "Try to load a previous checkpoint.") #7800 2400
+tf.app.flags.DEFINE_integer("load", 0, "Try to load a previous checkpoint.") #7800 2400
 
 
 
@@ -80,7 +79,6 @@ FLAGS.prediction_dir = FLAGS.prediction_dir + "_" + str(FLAGS.idx_split)
 
 
 train_dir = os.path.join( FLAGS.train_dir,
-  FLAGS.action,
   'split_{0}'.format(FLAGS.idx_split),
   'dropout_{0}'.format(FLAGS.dropout),
   'epochs_{0}'.format(FLAGS.epochs) if FLAGS.epochs > 0 else '',
@@ -93,7 +91,7 @@ train_dir = os.path.join( FLAGS.train_dir,
   'maxnorm' if FLAGS.max_norm else 'no_maxnorm',
   'batch_normalization' if FLAGS.batch_norm else 'no_batch_normalization',
   '{0}'.format(FLAGS.detector_2d),
-  'predict_14' if FLAGS.predict_14 else 'predict_17',
+  # 'predict_14' if FLAGS.predict_14 else 'predict_17',
   'center_2d' if FLAGS.centering_2d else 'not_center_2d')
 
 
@@ -167,7 +165,6 @@ def create_model( session, actions, batch_size, centering_2d = False, optimizer 
 
 
 
-
 def train_eccv18():
   """Train a linear model for 3d pose estimation"""
 
@@ -183,11 +180,11 @@ def train_eccv18():
     FLAGS.data_dir, FLAGS.centering_2d, FLAGS.detector_2d, FLAGS.idx_split, dim=2)
 
   # Avoid using the GPU if requested
-  device_count = {"GPU": FLAGS.idx_split} if FLAGS.use_cpu else {"GPU": 0}
-  # device_count = {"GPU": 3} if FLAGS.use_cpu else {"GPU": 0}
+
+  device_count = {"GPU": 0} if FLAGS.use_cpu else {"GPU": 1}
   with tf.Session(config=tf.ConfigProto(
-    device_count=device_count,
-    allow_soft_placement=True )) as sess:
+          device_count=device_count,
+          allow_soft_placement=True)) as sess:
 
     print("\n**********************************device_count**********************************\ndevice_count\n\n\n")
     # === Create the model ===
@@ -431,9 +428,11 @@ def eval_eccv18():
     FLAGS.data_dir, FLAGS.centering_2d, FLAGS.detector_2d, FLAGS.idx_split, dim=2)
 
 
-  # device_count = {"GPU": 2} if FLAGS.use_cpu else {"GPU": 1}
-  device_count = {"GPU": FLAGS.idx_split} if FLAGS.use_cpu else {"GPU": 0}
-  with tf.Session(config=tf.ConfigProto( device_count = device_count )) as sess:
+  device_count = {"GPU": 0} if FLAGS.use_cpu else {"GPU": 1}
+  with tf.Session(config=tf.ConfigProto(
+    device_count=device_count,
+    allow_soft_placement=True )) as sess:
+
     # === Create the model ===
     print("Creating %d layers of %d units." % (FLAGS.num_layers, FLAGS.linear_size))
     model = create_model(sess, actions, FLAGS.batch_size, FLAGS.centering_2d, for_eccv18=True)
@@ -495,8 +494,7 @@ def generate_3dpose_eccv18():
       # file_list.append(row[0].split('.jp')[0])
       file_list.append(row)
 
-  # device_count = {"GPU": 2} if FLAGS.use_cpu else {"GPU": 1}
-  device_count = {"GPU": FLAGS.idx_split} if FLAGS.use_cpu else {"GPU": 0}
+  device_count = {"GPU": 0} if FLAGS.use_cpu else {"GPU": 1}
   idx_file =0
   with tf.Session(config=tf.ConfigProto( device_count = device_count )) as sess:
     # === Create the model ===
@@ -507,6 +505,11 @@ def generate_3dpose_eccv18():
     n_joints = 17 if not (FLAGS.predict_14) else 14
     encoder_inputs = model.get_all_batches_2D_eccv18(test_set_2d)
     nbatches = len(encoder_inputs)
+
+    print("Model (%d step) created" % FLAGS.load)
+    g_step = model.global_step.eval()
+    print("g_step: ", g_step)
+
 
     for i in range(nbatches):
 
