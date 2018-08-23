@@ -31,7 +31,7 @@ import pandas as pd
 
 tf.app.flags.DEFINE_float("learning_rate", 1e-3, "Learning rate")
 tf.app.flags.DEFINE_float("dropout", 0.5, "Dropout keep probability. 1 means no dropout")
-tf.app.flags.DEFINE_integer("batch_size", 60000, "Batch size to use during training")
+tf.app.flags.DEFINE_integer("batch_size", 36000, "Batch size to use during training")
 tf.app.flags.DEFINE_integer("epochs", 7200, "How many epochs we should train for")
 tf.app.flags.DEFINE_integer("period_epoch_eval", 5, "Epoch period for evaluation and save")
 tf.app.flags.DEFINE_boolean("max_norm", True  , "Apply maxnorm constraint to the weights")
@@ -46,7 +46,7 @@ tf.app.flags.DEFINE_string("action","All", "The action to train on. 'All' means 
 
 # Architecture
 tf.app.flags.DEFINE_integer("linear_size", 1024, "Size of each model layer.")
-tf.app.flags.DEFINE_integer("num_layers", 2,  "Number of layers in the model.")
+tf.app.flags.DEFINE_integer("num_layers", 4,  "Number of layers in the model.")
 tf.app.flags.DEFINE_boolean("residual", True, "Whether to add a residual connection every 2 layers")
 
 # Evaluation
@@ -58,13 +58,13 @@ tf.app.flags.DEFINE_boolean("evaluateActionWise",False, "The dataset to use eith
 tf.app.flags.DEFINE_string("cameras_path","data/h36m/cameras.h5","Directory to load camera parameters")
 tf.app.flags.DEFINE_string("data_dir",   "data/h36m_eccv18_challenge/", "Data directory")  #data/h36m_muzi     data/h36m_eccv18_challenge/
 tf.app.flags.DEFINE_string("detector_2d",   "cpm", "2D pose detector name") #GT_pose_2d   cpm
-tf.app.flags.DEFINE_string("train_dir", "experiments_eccv18_1000_genuine", "Training directory.")
+tf.app.flags.DEFINE_string("train_dir", "experiments_eccv18", "Training directory.")
 tf.app.flags.DEFINE_string("prediction_dir", "eccv18_out", "3D prediction directory")
 
 # Train or load
-tf.app.flags.DEFINE_string("mode", 'train', "Experiment mode") # train / eval / generate
+tf.app.flags.DEFINE_string("mode", 'eval', "Experiment mode") # train / eval / generate
 tf.app.flags.DEFINE_boolean("use_cpu", False, "Whether to use the CPU")
-tf.app.flags.DEFINE_integer("load", 0, "Try to load a previous checkpoint.") #7800 2400
+tf.app.flags.DEFINE_integer("load", 4241, "Try to load a previous checkpoint.") #7800 2400
 
 
 
